@@ -379,20 +379,20 @@ func TestMultistatusWriter(t *testing.T) {
 		wantXML: `<?xml version="1.0" encoding="UTF-8"?>` +
 			`<D:multistatus xmlns:D="DAV:">` +
 			`<response xmlns="DAV:">` +
-			`<href xmlns="DAV:">http://example.com/foo</href>` +
-			`<propstat xmlns="DAV:">` +
-			`<prop>` +
+			`<href>http://example.com/foo</href>` +
+			`<propstat>` +
+			`<prop xmlns="">` +
 			`<Authors xmlns="http://ns.example.com/"></Authors>` +
 			`</prop>` +
-			`<status xmlns="DAV:">HTTP/1.1 424 Failed Dependency</status>` +
+			`<status>HTTP/1.1 424 Failed Dependency</status>` +
 			`</propstat>` +
-			`<propstat xmlns="DAV:">` +
-			`<prop>` +
+			`<propstat>` +
+			`<prop xmlns="">` +
 			`<Copyright-Owner xmlns="http://ns.example.com/"></Copyright-Owner>` +
 			`</prop>` +
-			`<status xmlns="DAV:">HTTP/1.1 409 Conflict</status>` +
+			`<status>HTTP/1.1 409 Conflict</status>` +
 			`</propstat>` +
-			`<responsedescription xmlns="DAV:">` +
+			`<responsedescription>` +
 			` Copyright Owner cannot be deleted or altered.` +
 			`</responsedescription>` +
 			`</response>` +
@@ -410,9 +410,9 @@ func TestMultistatusWriter(t *testing.T) {
 		wantXML: `<?xml version="1.0" encoding="UTF-8"?>` +
 			`<D:multistatus xmlns:D="DAV:">` +
 			`<response xmlns="DAV:">` +
-			`<href xmlns="DAV:">http://example.com/foo</href>` +
-			`<status xmlns="DAV:">HTTP/1.1 423 Locked</status>` +
-			`<error xmlns="DAV:"><lock-token-submitted xmlns="DAV:"/></error>` +
+			`<href>http://example.com/foo</href>` +
+			`<status>HTTP/1.1 423 Locked</status>` +
+			`<error><lock-token-submitted xmlns="DAV:"/></error>` +
 			`</response>` +
 			`</D:multistatus>`,
 		wantCode: StatusMulti,
@@ -449,9 +449,9 @@ func TestMultistatusWriter(t *testing.T) {
 		wantXML: `<?xml version="1.0" encoding="UTF-8"?>` +
 			`<D:multistatus xmlns:D="DAV:">` +
 			`<response xmlns="DAV:">` +
-			`<href xmlns="DAV:">http://example.com/foo</href>` +
-			`<propstat xmlns="DAV:">` +
-			`<prop>` +
+			`<href>http://example.com/foo</href>` +
+			`<propstat>` +
+			`<prop xmlns="">` +
 			`<bigbox xmlns="http://ns.example.com/boxschema/">` +
 			`<BoxType xmlns="http://ns.example.com/boxschema/">Box type A</BoxType>` +
 			`</bigbox>` +
@@ -459,17 +459,17 @@ func TestMultistatusWriter(t *testing.T) {
 			`<Name xmlns="http://ns.example.com/boxschema/">J.J. Johnson</Name>` +
 			`</author>` +
 			`</prop>` +
-			`<status xmlns="DAV:">HTTP/1.1 200 OK</status>` +
+			`<status>HTTP/1.1 200 OK</status>` +
 			`</propstat>` +
-			`<propstat xmlns="DAV:">` +
-			`<prop>` +
+			`<propstat>` +
+			`<prop xmlns="">` +
 			`<DingALing xmlns="http://ns.example.com/boxschema/">` +
 			`</DingALing>` +
 			`<Random xmlns="http://ns.example.com/boxschema/">` +
 			`</Random>` +
 			`</prop>` +
-			`<status xmlns="DAV:">HTTP/1.1 403 Forbidden</status>` +
-			`<responsedescription xmlns="DAV:">` +
+			`<status>HTTP/1.1 403 Forbidden</status>` +
+			`<responsedescription>` +
 			` The user does not have access to the DingALing property.` +
 			`</responsedescription>` +
 			`</propstat>` +
