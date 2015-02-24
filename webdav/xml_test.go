@@ -122,7 +122,7 @@ func TestReadLockInfo(t *testing.T) {
 			continue
 		}
 		if !reflect.DeepEqual(li, tc.wantLI) || status != tc.wantStatus {
-			t.Errorf("%s:\ngot  lockInfo=%v, status=%v\nwant lockInfo=%v, status=%v",
+			t.Errorf("%s:\ngot  lockInfo=%#v, status=%#v\nwant lockInfo=%#v, status=%#v",
 				tc.desc, li, status, tc.wantLI, tc.wantStatus)
 			continue
 		}
@@ -377,17 +377,17 @@ func TestMultistatusWriter(t *testing.T) {
 			ResponseDescription: " Copyright Owner cannot be deleted or altered.",
 		}},
 		wantXML: `<?xml version="1.0" encoding="UTF-8"?>` +
-			`<D:multistatus xmlns:D="DAV:">` +
-			`<response xmlns="DAV:">` +
+			`<multistatus xmlns="DAV:">` +
+			`<response>` +
 			`<href>http://example.com/foo</href>` +
 			`<propstat>` +
-			`<prop xmlns="">` +
+			`<prop>` +
 			`<Authors xmlns="http://ns.example.com/"></Authors>` +
 			`</prop>` +
 			`<status>HTTP/1.1 424 Failed Dependency</status>` +
 			`</propstat>` +
 			`<propstat>` +
-			`<prop xmlns="">` +
+			`<prop>` +
 			`<Copyright-Owner xmlns="http://ns.example.com/"></Copyright-Owner>` +
 			`</prop>` +
 			`<status>HTTP/1.1 409 Conflict</status>` +
@@ -396,7 +396,7 @@ func TestMultistatusWriter(t *testing.T) {
 			` Copyright Owner cannot be deleted or altered.` +
 			`</responsedescription>` +
 			`</response>` +
-			`</D:multistatus>`,
+			`</multistatus>`,
 		wantCode: StatusMulti,
 	}, {
 		desc: "section 9.6.2 (lock-token-submitted)",
@@ -408,13 +408,13 @@ func TestMultistatusWriter(t *testing.T) {
 			},
 		}},
 		wantXML: `<?xml version="1.0" encoding="UTF-8"?>` +
-			`<D:multistatus xmlns:D="DAV:">` +
-			`<response xmlns="DAV:">` +
+			`<multistatus xmlns="DAV:">` +
+			`<response>` +
 			`<href>http://example.com/foo</href>` +
 			`<status>HTTP/1.1 423 Locked</status>` +
 			`<error><lock-token-submitted xmlns="DAV:"/></error>` +
 			`</response>` +
-			`</D:multistatus>`,
+			`</multistatus>`,
 		wantCode: StatusMulti,
 	}, {
 		desc: "section 9.1.3",
@@ -447,11 +447,11 @@ func TestMultistatusWriter(t *testing.T) {
 		}},
 		respdesc: " There has been an access violation error.",
 		wantXML: `<?xml version="1.0" encoding="UTF-8"?>` +
-			`<D:multistatus xmlns:D="DAV:">` +
-			`<response xmlns="DAV:">` +
+			`<multistatus xmlns="DAV:">` +
+			`<response>` +
 			`<href>http://example.com/foo</href>` +
 			`<propstat>` +
-			`<prop xmlns="">` +
+			`<prop>` +
 			`<bigbox xmlns="http://ns.example.com/boxschema/">` +
 			`<BoxType xmlns="http://ns.example.com/boxschema/">Box type A</BoxType>` +
 			`</bigbox>` +
@@ -462,7 +462,7 @@ func TestMultistatusWriter(t *testing.T) {
 			`<status>HTTP/1.1 200 OK</status>` +
 			`</propstat>` +
 			`<propstat>` +
-			`<prop xmlns="">` +
+			`<prop>` +
 			`<DingALing xmlns="http://ns.example.com/boxschema/">` +
 			`</DingALing>` +
 			`<Random xmlns="http://ns.example.com/boxschema/">` +
@@ -474,10 +474,10 @@ func TestMultistatusWriter(t *testing.T) {
 			`</responsedescription>` +
 			`</propstat>` +
 			`</response>` +
-			`<D:responsedescription>` +
+			`<responsedescription>` +
 			` There has been an access violation error.` +
-			`</D:responsedescription>` +
-			`</D:multistatus>`,
+			`</responsedescription>` +
+			`</multistatus>`,
 		wantCode: StatusMulti,
 	}, {
 		desc: "bad: no response written",

@@ -18,11 +18,11 @@ import (
 
 // http://www.webdav.org/specs/rfc4918.html#ELEMENT_lockinfo
 type lockInfo struct {
-	XMLName   xml.Name  `xml:"lockinfo"`
-	Exclusive *struct{} `xml:"lockscope>exclusive"`
-	Shared    *struct{} `xml:"lockscope>shared"`
-	Write     *struct{} `xml:"locktype>write"`
-	Owner     owner     `xml:"owner"`
+	XMLName   xml.Name  `xml:"DAV: lockinfo"`
+	Exclusive *struct{} `xml:"DAV: lockscope>exclusive"`
+	Shared    *struct{} `xml:"DAV: lockscope>shared"`
+	Write     *struct{} `xml:"DAV: locktype>write"`
+	Owner     owner     `xml:"DAV: owner"`
 }
 
 // http://www.webdav.org/specs/rfc4918.html#ELEMENT_owner
@@ -217,7 +217,7 @@ type propstat struct {
 	// not honoring namespace declarations inside a xmltag with a
 	// parent element for anonymous slice elements.
 	// Use of multistatusWriter takes care of this.
-	Prop                []Property `xml:"prop>_ignored_"`
+	Prop                []Property `xml:"DAV: prop>_ignored_"`
 	Status              string     `xml:"DAV: status"`
 	Error               *xmlError  `xml:"DAV: error"`
 	ResponseDescription string     `xml:"DAV: responsedescription,omitempty"`
@@ -271,12 +271,24 @@ func (w *multistatusWriter) write(r *response) error {
 	if w.enc == nil {
 		w.w.Header().Add("Content-Type", "text/xml; charset=utf-8")
 		w.w.WriteHeader(StatusMulti)
-		_, err := fmt.Fprintf(w.w, `<?xml version="1.0" encoding="UTF-8"?>`+
-			`<D:multistatus xmlns:D="DAV:">`)
+		w.enc = xml.NewEncoder(w.w)
+		err := w.enc.EncodeToken(xml.ProcInst{
+			Target: "xml",
+			Inst:   []byte(`version="1.0" encoding="UTF-8"`),
+		})
 		if err != nil {
 			return err
 		}
-		w.enc = xml.NewEncoder(w.w)
+		err = w.enc.EncodeToken(xml.StartElement{
+			Name: xml.Name{Space: "DAV:", Local: "multistatus"},
+			Attr: []xml.Attr{{
+				Name:  xml.Name{Local: "xmlns"},
+				Value: "DAV:",
+			}},
+		})
+		if err != nil {
+			return err
+		}
 	}
 	return w.enc.Encode(r)
 }
@@ -290,13 +302,28 @@ func (w *multistatusWriter) close() error {
 		return nil
 	}
 	if w.responseDescription != "" {
-		_, err := fmt.Fprintf(w.w,
-			"<D:responsedescription>%s</D:responsedescription>",
-			w.responseDescription)
+		err := w.enc.EncodeToken(xml.StartElement{
+			Name: xml.Name{Space: "DAV:", Local: "responsedescription"},
+		})
+		if err != nil {
+			return err
+		}
+		err = w.enc.EncodeToken(xml.CharData(w.responseDescription))
+		if err != nil {
+			return err
+		}
+		err = w.enc.EncodeToken(xml.EndElement{
+			Name: xml.Name{Space: "DAV:", Local: "responsedescription"},
+		})
 		if err != nil {
 			return err
 		}
 	}
-	_, err := fmt.Fprintf(w.w, "</D:multistatus>")
-	return err
+	err := w.enc.EncodeToken(xml.EndElement{
+		Name: xml.Name{Space: "DAV:", Local: "multistatus"},
+	})
+	if err != nil {
+		return err
+	}
+	return w.enc.Flush()
 }
